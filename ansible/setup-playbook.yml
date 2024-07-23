@@ -28,9 +28,9 @@
 
     - name: Build configurator app.
       command: sudo mvn package --quiet
-      creates: /setup-build
       args:
         chdir: "{{ path }}/ansible-training-setup"
+        creates: /setup-build
 
     - name: Creates terraform directory.
       file:
