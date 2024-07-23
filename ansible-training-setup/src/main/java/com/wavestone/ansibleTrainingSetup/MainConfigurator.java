@@ -63,7 +63,7 @@ public class MainConfigurator implements ApplicationRunner {
         String currentAwxVM = awxVM
                 .replace("{awx-machine-type}", configurationInput.awxMachineType());
 
-        String path = args.getOptionValues("path").getFirst();
+        String path = args.getOptionValues("path").get(0);
 
         Files.writeString(Path.of(path + "/provider.tf"), currentProvider);
         Files.writeString(Path.of(path + "/services.tf"), services);

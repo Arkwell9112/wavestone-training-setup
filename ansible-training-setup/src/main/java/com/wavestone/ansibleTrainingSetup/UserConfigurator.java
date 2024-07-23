@@ -35,7 +35,7 @@ public class UserConfigurator implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        String path = args.getOptionValues("path").getFirst();
+        String path = args.getOptionValues("path").get(0);
 
         int index = 2;
         for (ConfigurationInput.User user : configurationInput.users()) {

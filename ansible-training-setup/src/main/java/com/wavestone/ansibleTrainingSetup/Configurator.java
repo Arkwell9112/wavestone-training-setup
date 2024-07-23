@@ -17,6 +17,6 @@ public class Configurator {
 
     @Bean
     public ConfigurationInput configurationInputs(ApplicationArguments applicationArguments) throws IOException {
-        return objectMapper().readValue(new File(applicationArguments.getOptionValues("input").getFirst()), ConfigurationInput.class);
+        return objectMapper().readValue(new File(applicationArguments.getOptionValues("input").get(0)), ConfigurationInput.class);
     }
 }
