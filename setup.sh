@@ -1,8 +1,6 @@
 #!/bin/bash
 
-path="$(dirname "$0")"
-
-cd "${path}" || exit
+path="${PWD}"
 
 if [[ ! -f "/ansible" ]]
 then
