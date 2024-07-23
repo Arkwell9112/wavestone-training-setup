@@ -20,8 +20,6 @@ public class MainConfigurator implements ApplicationRunner {
 
     private final String provider;
 
-    private final String services;
-
     private final String vpc;
 
     private final String firewall;
@@ -36,7 +34,6 @@ public class MainConfigurator implements ApplicationRunner {
             ResourceToString resourceToString,
             ConfigurationInput configurationInput,
             @Value("classpath:provider.tf") Resource provider,
-            @Value("classpath:services.tf") Resource services,
             @Value("classpath:vpc.tf") Resource vpc,
             @Value("classpath:firewall.tf") Resource firewall,
             @Value("classpath:service-account.tf") Resource serviceAccount,
@@ -45,7 +42,6 @@ public class MainConfigurator implements ApplicationRunner {
     ) throws IOException {
         this.configurationInput = configurationInput;
         this.provider = resourceToString.resourceToString(provider);
-        this.services = resourceToString.resourceToString(services);
         this.vpc = resourceToString.resourceToString(vpc);
         this.firewall = resourceToString.resourceToString(firewall);
         this.serviceAccount = resourceToString.resourceToString(serviceAccount);
@@ -66,7 +62,6 @@ public class MainConfigurator implements ApplicationRunner {
         String path = args.getOptionValues("path").get(0);
 
         Files.writeString(Path.of(path + "/provider.tf"), currentProvider);
-        Files.writeString(Path.of(path + "/services.tf"), services);
         Files.writeString(Path.of(path + "/vpc.tf"), vpc);
         Files.writeString(Path.of(path + "/firewall.tf"), firewall);
         Files.writeString(Path.of(path + "/service-account.tf"), serviceAccount);
