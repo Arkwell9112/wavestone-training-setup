@@ -32,7 +32,7 @@
         state: latest
 
     - name: Build configurator app.
-      command: mvn package
+      command: sudo mvn package --quiet
       args:
         chdir: "{{ path }}/ansible-training-setup"
 
@@ -42,6 +42,6 @@
         state: directory
 
     - name: Execute configurator setup target.
-      command: "/usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.active.profiles=setup --path=/terraform --input={{ inputPath }}"
+      command: "sudo /usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.active.profiles=setup --path=/terraform --input={{ inputPath }}"
       args:
         chdir: "{{ path }}"
