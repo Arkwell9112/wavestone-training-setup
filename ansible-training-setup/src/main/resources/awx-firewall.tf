@@ -6,7 +6,7 @@ resource "google_compute_firewall" "awx_ingress_external" {
   direction = "INGRESS"
 
   source_ranges      = ["0.0.0.0/0"]
-  destination_ranges = ["10.1.1.0/8"]
+  destination_ranges = ["10.1.1.0/24"]
 
   allow {
     protocol = "tcp"

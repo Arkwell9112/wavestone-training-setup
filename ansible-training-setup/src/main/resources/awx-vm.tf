@@ -1,6 +1,6 @@
 resource "google_compute_subnetwork" "awx_subnet" {
   name          = "awx-subnet"
-  ip_cidr_range = "10.1.1.0/8"
+  ip_cidr_range = "10.1.1.0/24"
   network       = google_compute_network.vpc.id
 }
 

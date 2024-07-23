@@ -42,7 +42,7 @@ public class UserConfigurator implements ApplicationRunner {
             String currentUserXVM = userXVM
                     .replace("user-x-subnet-id", String.format("user_%s_subnet", index))
                     .replace("{user-x-subnet-name}", String.format("user-%s-subnet", index))
-                    .replace("{user-x-subnet-range}", String.format("10.1.%s.0/8", index))
+                    .replace("{user-x-subnet-range}", String.format("10.1.%s.0/24", index))
                     .replace("user-x-ip-id", String.format("user_%s_ip", index))
                     .replace("{user-x-ip-name}", String.format("user-%s-ip", index))
                     .replace("user-x-vm-id", String.format("user_%s_vm", index))
@@ -55,7 +55,7 @@ public class UserConfigurator implements ApplicationRunner {
             String currentUserXFirewall = userXFirewall
                     .replace("user-x-ingress-internal-id", String.format("user_%s_ingress_internal", index))
                     .replace("{user-x-ingress-internal-name}", String.format("user-%s-ingress-internal", index))
-                    .replace("{user-x-ingress-destination-range}", String.format("10.1.%s.0/8", index))
+                    .replace("{user-x-ingress-destination-range}", String.format("10.1.%s.0/24", index))
                     .replace("user-x-ingress-external-id", String.format("user_%s_ingress_external", index))
                     .replace("{user-x-ingress-external-name}", String.format("user-%s-ingress-external", index));
 

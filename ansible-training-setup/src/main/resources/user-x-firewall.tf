@@ -5,7 +5,7 @@ resource "google_compute_firewall" "user-x-ingress-internal-id" {
 
   direction = "INGRESS"
 
-  source_ranges      = ["10.1.1.0/8"]
+  source_ranges      = ["10.1.1.0/24"]
   destination_ranges = ["{user-x-ingress-destination-range}"]
 
   allow {
