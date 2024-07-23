@@ -21,21 +21,13 @@
         state: latest
         update_cache: true
 
-    - name: Install OpenJDK 21.
-      apt:
-        name: openjdk-21-jdk
-        state: latest
-
-    - name: Change Java version to 21.
-      command: update-alternatives --set java $(update-alternatives --list java | grep java-21)
-
     - name: Install Maven.
       apt:
         name: maven
         state: latest
 
     - name: Build configurator app.
-      command: JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64/bin sudo mvn package --quiet
+      command: sudo mvn package --quiet
       args:
         chdir: "{{ path }}/ansible-training-setup"
 
@@ -45,6 +37,6 @@
         state: directory
 
     - name: Execute configurator setup target.
-      command: "sudo /usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.active.profiles=setup --path=/terraform --input={{ inputPath }}"
+      command: "sudo java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.active.profiles=setup --path=/terraform --input={{ inputPath }}"
       args:
         chdir: "{{ path }}"
