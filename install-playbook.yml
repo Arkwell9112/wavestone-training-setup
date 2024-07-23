@@ -26,13 +26,16 @@
         name: openjdk-21-jdk
         state: latest
 
+    - name: Change Java version to 21.
+      command: update-alternatives --set java $(update-alternatives --list java | grep java-21)
+
     - name: Install Maven.
       apt:
         name: maven
         state: latest
 
     - name: Build configurator app.
-      command: sudo mvn package --quiet
+      command: JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64/bin sudo mvn package --quiet
       args:
         chdir: "{{ path }}/ansible-training-setup"
 
