@@ -37,6 +37,6 @@
         state: directory
 
     - name: Execute configurator setup target.
-      command: "sudo java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.active.profiles=setup --path=/terraform --input={{ inputPath }}"
+      command: "sudo java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.profiles.active=setup --path=terraform --input={{ inputPath }}"
       args:
         chdir: "{{ path }}"
