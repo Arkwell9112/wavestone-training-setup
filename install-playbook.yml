@@ -1,0 +1,47 @@
+---
+
+- name: Installation Playbook for Ansible Training at Wavestone.
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Install HashiCorp gpg.
+      apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+
+    - name: Install HashiCorp apt repo.
+      apt_repository:
+        repo: deb https://apt.releases.hashicorp.com jammy main
+        state: present
+
+    - name: Update apt and Install Terraform.
+      apt:
+        name: terraform
+        state: latest
+        update_cache: true
+
+    - name: Install OpenJDK 21.
+      apt:
+        name: openjdk-21-jdk
+        state: latest
+
+    - name: Install Maven.
+      apt:
+        name: maven
+        state: latest
+
+    - name: Build configurator app.
+      command: mvn package
+      args:
+        chdir: "{{ path }}/ansible-training-setup"
+
+    - name: Creates terraform directory.
+      file:
+        path: "{{ path }}/terraform"
+        state: directory
+
+    - name: Execute configurator setup target.
+      command: "/usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.active.profiles=setup --path=/terraform --input={{ inputPath }}"
+      args:
+        chdir: "{{ path }}"
