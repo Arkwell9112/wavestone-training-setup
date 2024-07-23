@@ -27,7 +27,7 @@ public class Configurator {
         String rawKey = Files.readString(Path.of(applicationArguments.getOptionValues("sshPath").get(0)));
 
         String[] keyParts = rawKey.split(" ");
-        String key = keyParts[0] + " " + keyParts[1]
+        String key = keyParts[0] + " " + keyParts[1];
 
         return new SSHKeyConfiguration(key);
     }
