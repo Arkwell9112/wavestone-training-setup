@@ -18,6 +18,8 @@ import java.nio.file.Path;
 public class UserConfigurator implements ApplicationRunner {
     private final ConfigurationInput configurationInput;
 
+    private final SSHKeyConfiguration sshKeyConfiguration;
+
     private final String userXVM;
 
     private final String userXFirewall;
@@ -25,10 +27,12 @@ public class UserConfigurator implements ApplicationRunner {
     public UserConfigurator(
             ResourceToString resourceToString,
             ConfigurationInput configurationInput,
+            SSHKeyConfiguration sshKeyConfiguration,
             @Value("classpath:user-x-vm.tf") Resource userXVM,
             @Value("classpath:user-x-firewall.tf") Resource userXFirewall
     ) throws IOException {
         this.configurationInput = configurationInput;
+        this.sshKeyConfiguration = sshKeyConfiguration;
         this.userXVM = resourceToString.resourceToString(userXVM);
         this.userXFirewall = resourceToString.resourceToString(userXFirewall);
     }
@@ -37,8 +41,7 @@ public class UserConfigurator implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         String path = args.getOptionValues("path").get(0);
 
-        int index = 2;
-        for (ConfigurationInput.User user : configurationInput.users()) {
+        for (int index = 2; index < configurationInput.users().size(); index++) {
             String currentUserXVM = userXVM
                     .replace("user-x-subnet-id", String.format("user_%s_subnet", index))
                     .replace("{user-x-subnet-name}", String.format("user-%s-subnet", index))
@@ -50,7 +53,8 @@ public class UserConfigurator implements ApplicationRunner {
                     .replace("{user-machine-type}", configurationInput.userMachineType())
                     .replace("{user-x-owner}", String.format("user-%s", index))
                     .replace("user-x-vm-public-ip-output-id", String.format("user_%s_vm_public_ip_output", index))
-                    .replace("user-x-vm-private-ip-output-id", String.format("user_%s_vm_private_ip_output", index));
+                    .replace("user-x-vm-private-ip-output-id", String.format("user_%s_vm_private_ip_output", index))
+                    .replace("{ssh-key}", sshKeyConfiguration.sshKey());
 
             String currentUserXFirewall = userXFirewall
                     .replace("user-x-ingress-internal-id", String.format("user_%s_ingress_internal", index))
@@ -61,8 +65,6 @@ public class UserConfigurator implements ApplicationRunner {
 
             Files.writeString(Path.of(path + String.format("/user-%s-vm.tf", index)), currentUserXVM);
             Files.writeString(Path.of(path + String.format("/user-%s-firewall.tf", index)), currentUserXFirewall);
-
-            index++;
         }
     }
 }

@@ -1,0 +1,66 @@
+---
+
+- name: Installation Playbook for AWX Server in Ansible Training at Wavestone.
+  hosts: gcp_category_awx
+  become: yes
+
+  tasks:
+    - name: Install Docker gpg.
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Install Docker apt repo.
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian bullseye stable
+        state: present
+
+    - name: Install Ansible gpg.
+      apt_key:
+        url: https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
+        state: present
+
+    - name: Install Ansible apt repo.
+      apt_repository:
+        repo: deb http://ppa.launchpad.net/ansible/ansible/ubuntu focal main
+        state: present
+
+    - name: Update apt and Install Docker.
+      apt:
+        name: docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        state: latest
+        update_cache: true
+
+    - name: Install Ansible.
+      apt:
+        name: ansible
+        state: latest
+
+    - name: Install Make.
+      apt:
+        name: make
+        state: latest
+
+    - name: Install Git.
+      apt:
+        name: git
+        state: latest
+
+    - name: Create directory for AWX repo.
+      file:
+        path: /awx
+        state: directory
+
+    - name: Clone AWX repo.
+      git:
+        repo: https://github.com/ansible/awx.git
+        dest: /awx
+        single_branch: yes
+        version: 24.6.1
+
+    - name: Start AWX.
+      make:
+        chdir: /awx
+        target: docker-compose
+        params:
+          COMPOSE_UP_OPTS: -d

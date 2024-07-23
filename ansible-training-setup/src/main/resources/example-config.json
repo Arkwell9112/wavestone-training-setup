@@ -1,7 +1,7 @@
 {
   "project": "ansible-training-setup-a",
   "region": "europe-west9",
-  "zone": "europe-west9-a",
+  "zone": "europe-west9-c",
   "awxMachineType": "n2-standard-2",
   "userMachineType": "e2-standard-2",
   "users": [

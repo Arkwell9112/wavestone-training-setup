@@ -1,7 +1,7 @@
 resource "google_compute_firewall" "awx_ingress_external" {
   name     = "awx-ingress-external"
   network  = google_compute_network.vpc.name
-  priority = 999
+  priority = 998
 
   direction = "INGRESS"
 

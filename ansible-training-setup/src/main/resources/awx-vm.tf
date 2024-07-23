@@ -16,6 +16,10 @@ resource "google_compute_instance" "awx_vm" {
     category = "awx"
   }
 
+  metadata = {
+    "ssh-keys" = "ansible:{ssh-key} ansible"
+  }
+
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"

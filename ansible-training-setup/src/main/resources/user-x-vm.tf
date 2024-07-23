@@ -17,6 +17,10 @@ resource "google_compute_instance" "user-x-vm-id" {
     owner    = "{user-x-owner}"
   }
 
+  metadata = {
+    "ssh-keys" = "ansible:{ssh-key} ansible"
+  }
+
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"

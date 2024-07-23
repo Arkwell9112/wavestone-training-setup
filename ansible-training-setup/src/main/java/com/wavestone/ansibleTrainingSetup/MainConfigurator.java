@@ -18,6 +18,8 @@ import java.nio.file.Path;
 public class MainConfigurator implements ApplicationRunner {
     private final ConfigurationInput configurationInput;
 
+    private final SSHKeyConfiguration sshKeyConfiguration;
+
     private final String provider;
 
     private final String vpc;
@@ -33,6 +35,7 @@ public class MainConfigurator implements ApplicationRunner {
     public MainConfigurator(
             ResourceToString resourceToString,
             ConfigurationInput configurationInput,
+            SSHKeyConfiguration sshKeyConfiguration,
             @Value("classpath:provider.tf") Resource provider,
             @Value("classpath:vpc.tf") Resource vpc,
             @Value("classpath:firewall.tf") Resource firewall,
@@ -41,6 +44,7 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:awx-firewall.tf") Resource awxFirewall
     ) throws IOException {
         this.configurationInput = configurationInput;
+        this.sshKeyConfiguration = sshKeyConfiguration;
         this.provider = resourceToString.resourceToString(provider);
         this.vpc = resourceToString.resourceToString(vpc);
         this.firewall = resourceToString.resourceToString(firewall);
@@ -57,7 +61,8 @@ public class MainConfigurator implements ApplicationRunner {
                 .replace("{region}", configurationInput.region())
                 .replace("{zone}", configurationInput.zone());
         String currentAwxVM = awxVM
-                .replace("{awx-machine-type}", configurationInput.awxMachineType());
+                .replace("{awx-machine-type}", configurationInput.awxMachineType())
+                .replace("{ssh-key}", sshKeyConfiguration.sshKey());
 
         String path = args.getOptionValues("path").get(0);
 
