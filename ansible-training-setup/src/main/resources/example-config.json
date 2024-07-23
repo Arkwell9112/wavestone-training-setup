@@ -1,5 +1,5 @@
 {
-  "project": "wavestone-test-a-training",
+  "project": "ansible-training-setup-a",
   "region": "europe-west9",
   "zone": "europe-west9-a",
   "awxMachineType": "n2-standard-2",

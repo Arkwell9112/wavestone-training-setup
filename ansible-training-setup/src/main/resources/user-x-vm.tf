@@ -23,10 +23,6 @@ resource "google_compute_instance" "user-x-vm-id" {
     }
   }
 
-  scratch_disk {
-    interface = "NVME"
-  }
-
   network_interface {
     subnetwork = google_compute_subnetwork.user-x-subnet-id.name
     access_config {
