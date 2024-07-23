@@ -41,7 +41,7 @@ public class UserConfigurator implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         String path = args.getOptionValues("path").get(0);
 
-        for (int index = 2; index < configurationInput.users().size(); index++) {
+        for (int index = 2; index < configurationInput.users().size() + 2; index++) {
             String currentUserXVM = userXVM
                     .replace("user-x-subnet-id", String.format("user_%s_subnet", index))
                     .replace("{user-x-subnet-name}", String.format("user-%s-subnet", index))
