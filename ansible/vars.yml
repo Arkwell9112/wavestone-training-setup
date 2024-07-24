@@ -1,3 +1,3 @@
 ---
 
-awx-version: "{awx-version}"
+awxOperatorVersion: "{awx-operator-version}"

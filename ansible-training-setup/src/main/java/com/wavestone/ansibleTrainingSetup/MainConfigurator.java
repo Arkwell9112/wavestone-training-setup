@@ -85,8 +85,15 @@ public class MainConfigurator implements ApplicationRunner {
         Path varsPath = Path.of(ansiblePath + "/vars.yml");
 
         String vars = Files.readString(varsPath)
-                .replace("{awx-version}", configurationInput.awxVersion());
+                .replace("{awx-operator-version}", configurationInput.awxOperatorVersion());
 
         Files.writeString(varsPath, vars);
+
+        Path kustomizationPath = Path.of(ansiblePath + "/kustomization.yml");
+
+        String kustomization = Files.readString(varsPath)
+                .replace("{awx-operator-version}", configurationInput.awxOperatorVersion());
+
+        Files.writeString(kustomizationPath, kustomization);
     }
 }

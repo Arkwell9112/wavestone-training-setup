@@ -7,42 +7,6 @@
   tasks:
     - include_vars: vars.yml
 
-    - name: Install Docker gpg.
-      apt_key:
-        url: https://download.docker.com/linux/debian/gpg
-        state: present
-
-    - name: Install Docker apt repo.
-      apt_repository:
-        repo: deb https://download.docker.com/linux/debian bullseye stable
-        state: present
-
-    - name: Install Ansible gpg.
-      apt_key:
-        url: https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
-        state: present
-
-    - name: Install Ansible apt repo.
-      apt_repository:
-        repo: deb http://ppa.launchpad.net/ansible/ansible/ubuntu focal main
-        state: present
-
-    - name: Update apt and Install Docker.
-      apt:
-        pkg:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-        state: latest
-        update_cache: true
-
-    - name: Install Ansible.
-      apt:
-        name: ansible
-        state: latest
-
     - name: Install Make.
       apt:
         name: make
@@ -53,36 +17,52 @@
         name: git
         state: latest
 
-    - name: Create directory for AWX repo.
+    - name: Install k3s.
+      command: curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+      args:
+        creates: /k3s
+
+    - name: Validate - Install k3s.
+      command: touch /k3s
+      args:
+        creates: /k3s
+
+    - name: Create directory for AWX Operator repo.
       file:
-        path: /awx
+        path: /awx-operator
         state: directory
 
-    - name: Clone AWX repo.
+    - name: Clone AWX Operator repo.
       git:
-        repo: https://github.com/ansible/awx.git
-        dest: /awx
+        repo: https://github.com/ansible/awx-operator.git
+        dest: /awx-operator
         single_branch: yes
-        version: "{{ awx-version }}"
+        version: "{{ awxOperatorVersion }}"
 
-    - name: Build AWX Containers.
+    - name: Copy AWX Kube config 1/2.
+      copy:
+        src: kustomization.yml
+        dest: /awx-operator/kustomization.yml
+        owner: ansible
+        group: ansible
+        mode: "770"
+
+    - name: Copy AWX Kube config 2/2.
+      copy:
+        src: awx.yml
+        dest: /awx-operator/awx.yml
+        owner: ansible
+        group: ansible
+        mode: "770"
+
+    - name: Start AWX Operator.
       make:
-        chdir: /awx
-        target: docker-compose-build
+        target: deploy
+        chdir: /awx-operator
+      environment:
+        NAMESPACE: awx
 
-    - name: Start AWX Containers.
-      make:
-        chdir: /awx
-        target: docker-compose
-        params:
-          COMPOSE_UP_OPTS: -d
-
-    - name: Build and Start AWX UI/API.
-      command: docker exec tools_awx_1 make clean-ui ui-devel
+    - name: Start AWX.
+      command: kubectl apply -n awx -k .
       args:
-        creates: /ui-api-build-start
-
-    - name: Validate - Build and Start AWX UI/API.
-      command: touch /ui-api-build-start
-      args:
-        creates: /ui-api-build-start
+        chdir: /awx-operator
