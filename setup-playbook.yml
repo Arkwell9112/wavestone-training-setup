@@ -30,25 +30,30 @@
       command: sudo mvn package --quiet
       args:
         chdir: "{{ path }}/ansible-training-setup"
-        creates: /setup-build
-
-    - name: Validate - Build configurator app.
-      command: touch /setup-build
-      args:
-        creates: /setup-build
+        creates: "{{ path }}/ansible-training-setup/target/ansible-training-setup.jar"
 
     - name: Creates terraform directory.
       file:
         path: "{{ path }}/terraform"
         state: directory
 
+    - name: Creates ansible directory.
+      file:
+        path: "{{ path }}/ansible"
+        state: directory
+
+    - name: Creates k3s directory.
+      file:
+        path: "{{ path }}/k3s"
+        state: directory
+
+    - name: Creates SSH key.
+      command: ssh-keygen -q -t rsa -b 4096 -N '' -f ssh-key
+      args:
+        chdir: "{{ path }}/ansible"
+        creates: "{{ path }}/ansible/ssh-key"
+
     - name: Execute configurator setup target.
-      command: "sudo java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.profiles.active=setup --path=terraform --ansiblePath=ansible --input={{ inputPath }}"
+      command: "sudo java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.profiles.active=setup --path={{ path }} --input={{ inputPath }}"
       args:
         chdir: "{{ path }}"
-        creates: /setup-execute
-
-    - name: Validate - Execute configurator setup target.
-      command: touch /setup-execute
-      args:
-        creates: /setup-execute

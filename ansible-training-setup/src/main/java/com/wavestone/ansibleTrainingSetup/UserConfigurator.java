@@ -16,7 +16,7 @@ import java.nio.file.Path;
 @Profile("setup")
 @Order(1)
 public class UserConfigurator implements ApplicationRunner {
-    private final ConfigurationInput configurationInput;
+    private final InputConfiguration inputConfiguration;
 
     private final SSHKeyConfiguration sshKeyConfiguration;
 
@@ -26,12 +26,12 @@ public class UserConfigurator implements ApplicationRunner {
 
     public UserConfigurator(
             ResourceToString resourceToString,
-            ConfigurationInput configurationInput,
+            InputConfiguration inputConfiguration,
             SSHKeyConfiguration sshKeyConfiguration,
-            @Value("classpath:user-x-vm.tf") Resource userXVM,
-            @Value("classpath:user-x-firewall.tf") Resource userXFirewall
+            @Value("classpath:terraform/user-x-vm.tf") Resource userXVM,
+            @Value("classpath:terraform/user-x-firewall.tf") Resource userXFirewall
     ) throws IOException {
-        this.configurationInput = configurationInput;
+        this.inputConfiguration = inputConfiguration;
         this.sshKeyConfiguration = sshKeyConfiguration;
         this.userXVM = resourceToString.resourceToString(userXVM);
         this.userXFirewall = resourceToString.resourceToString(userXFirewall);
@@ -41,8 +41,14 @@ public class UserConfigurator implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         String path = args.getOptionValues("path").get(0);
 
-        for (int index = 2; index < configurationInput.users().size() + 2; index++) {
+        for (int index = 2; index < inputConfiguration.users().size() + 2; index++) {
+            // Prepare terraform main config for user.
             String currentUserXVM = userXVM
+                    .replace("{user-machine-type}", inputConfiguration.userMachineType())
+                    .replace("{ssh-key}", sshKeyConfiguration.sshKey());
+
+            // Prepare terraform user config for user.
+            currentUserXVM = currentUserXVM
                     .replace("user-x-subnet-id", String.format("user_%s_subnet", index))
                     .replace("{user-x-subnet-name}", String.format("user-%s-subnet", index))
                     .replace("{user-x-subnet-range}", String.format("10.1.%s.0/24", index))
@@ -50,11 +56,9 @@ public class UserConfigurator implements ApplicationRunner {
                     .replace("{user-x-ip-name}", String.format("user-%s-ip", index))
                     .replace("user-x-vm-id", String.format("user_%s_vm", index))
                     .replace("{user-x-vm-name}", String.format("user-%s-vm", index))
-                    .replace("{user-machine-type}", configurationInput.userMachineType())
                     .replace("{user-x-owner}", String.format("user-%s", index))
                     .replace("user-x-vm-public-ip-output-id", String.format("user_%s_vm_public_ip_output", index))
-                    .replace("user-x-vm-private-ip-output-id", String.format("user_%s_vm_private_ip_output", index))
-                    .replace("{ssh-key}", sshKeyConfiguration.sshKey());
+                    .replace("user-x-vm-private-ip-output-id", String.format("user_%s_vm_private_ip_output", index));
 
             String currentUserXFirewall = userXFirewall
                     .replace("user-x-ingress-internal-id", String.format("user_%s_ingress_internal", index))
@@ -63,8 +67,9 @@ public class UserConfigurator implements ApplicationRunner {
                     .replace("user-x-ingress-external-id", String.format("user_%s_ingress_external", index))
                     .replace("{user-x-ingress-external-name}", String.format("user-%s-ingress-external", index));
 
-            Files.writeString(Path.of(path + String.format("/user-%s-vm.tf", index)), currentUserXVM);
-            Files.writeString(Path.of(path + String.format("/user-%s-firewall.tf", index)), currentUserXFirewall);
+            // Write terraform user config for user.
+            Files.writeString(Path.of(path + "/terraform" + String.format("/user-%s-vm.tf", index)), currentUserXVM);
+            Files.writeString(Path.of(path + "/terraform" + String.format("/user-%s-firewall.tf", index)), currentUserXFirewall);
         }
     }
 }

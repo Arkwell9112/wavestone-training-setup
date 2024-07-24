@@ -41,7 +41,7 @@
 
     - name: Copy AWX Kube config 1/2.
       copy:
-        src: kustomization.yml
+        src: "{{ path }}/k3s/kustomization.yml"
         dest: /awx-operator/kustomization.yml
         owner: ansible
         group: ansible
@@ -49,7 +49,7 @@
 
     - name: Copy AWX Kube config 2/2.
       copy:
-        src: awx.yml
+        src: "{{ path }}/k3s/awx.yml"
         dest: /awx-operator/awx.yml
         owner: ansible
         group: ansible

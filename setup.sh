@@ -1,7 +1,5 @@
 #!/bin/bash
 
-path="${PWD}"
-
 if [[ ! -f "/ansible" ]]
 then
   UBUNTU_CODENAME=jammy
@@ -12,11 +10,6 @@ then
   touch /ansible
 fi
 
-if [[ ! -f "ansible/ssh-key" ]]
-then
-  ssh-keygen -q -t rsa -b 4096 -N '' -f ansible/ssh-key
-fi
-
-cd ansible || exit
+path="${PWD}"
 
 ansible-playbook setup-playbook.yml --extra-vars "path=${path} inputPath=${1}"

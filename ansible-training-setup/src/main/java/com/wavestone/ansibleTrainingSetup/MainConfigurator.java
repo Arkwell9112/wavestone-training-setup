@@ -16,7 +16,7 @@ import java.nio.file.Path;
 @Profile("setup")
 @Order(0)
 public class MainConfigurator implements ApplicationRunner {
-    private final ConfigurationInput configurationInput;
+    private final InputConfiguration inputConfiguration;
 
     private final SSHKeyConfiguration sshKeyConfiguration;
 
@@ -32,18 +32,36 @@ public class MainConfigurator implements ApplicationRunner {
 
     private final String awxFirewall;
 
+    private final String ansibleCfg;
+
+    private final String vars;
+
+    private final String awxSetupPlaybook;
+
+    private final String publicInventoryGcp;
+
+    private final String kustomization;
+
+    private final String awxK3s;
+
     public MainConfigurator(
             ResourceToString resourceToString,
-            ConfigurationInput configurationInput,
+            InputConfiguration inputConfiguration,
             SSHKeyConfiguration sshKeyConfiguration,
-            @Value("classpath:provider.tf") Resource provider,
-            @Value("classpath:vpc.tf") Resource vpc,
-            @Value("classpath:firewall.tf") Resource firewall,
-            @Value("classpath:service-account.tf") Resource serviceAccount,
-            @Value("classpath:awx-vm.tf") Resource awxVM,
-            @Value("classpath:awx-firewall.tf") Resource awxFirewall
+            @Value("classpath:terraform/provider.tf") Resource provider,
+            @Value("classpath:terraform/vpc.tf") Resource vpc,
+            @Value("classpath:terraform/firewall.tf") Resource firewall,
+            @Value("classpath:terraform/service-account.tf") Resource serviceAccount,
+            @Value("classpath:terraform/awx-vm.tf") Resource awxVM,
+            @Value("classpath:terraform/awx-firewall.tf") Resource awxFirewall,
+            @Value("classpath:ansible/ansible.cfg") Resource ansibleCfg,
+            @Value("classpath:ansible/vars.yml") Resource vars,
+            @Value("classpath:ansible/awx-setupPlaybook.yml") Resource awxSetupPlaybook,
+            @Value("classpath:ansible/public-inventory-gcp.yml") Resource publicInventoryGcp,
+            @Value("classpath:k3s/kustomization.yml") Resource kustomization,
+            @Value("classpath:k3s/awx.yml") Resource awxK3s
     ) throws IOException {
-        this.configurationInput = configurationInput;
+        this.inputConfiguration = inputConfiguration;
         this.sshKeyConfiguration = sshKeyConfiguration;
         this.provider = resourceToString.resourceToString(provider);
         this.vpc = resourceToString.resourceToString(vpc);
@@ -51,49 +69,54 @@ public class MainConfigurator implements ApplicationRunner {
         this.serviceAccount = resourceToString.resourceToString(serviceAccount);
         this.awxVM = resourceToString.resourceToString(awxVM);
         this.awxFirewall = resourceToString.resourceToString(awxFirewall);
+        this.ansibleCfg = resourceToString.resourceToString(ansibleCfg);
+        this.vars = resourceToString.resourceToString(vars);
+        this.awxSetupPlaybook = resourceToString.resourceToString(awxSetupPlaybook);
+        this.publicInventoryGcp = resourceToString.resourceToString(publicInventoryGcp);
+        this.kustomization = resourceToString.resourceToString(kustomization);
+        this.awxK3s = resourceToString.resourceToString(awxK3s);
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        String currentProvider = provider
-                .replace("{project}", configurationInput.project())
-                .replace("{region}", configurationInput.region())
-                .replace("{zone}", configurationInput.zone());
-        String currentAwxVM = awxVM
-                .replace("{awx-machine-type}", configurationInput.awxMachineType())
-                .replace("{ssh-key}", sshKeyConfiguration.sshKey());
-
         String path = args.getOptionValues("path").get(0);
 
-        Files.writeString(Path.of(path + "/provider.tf"), currentProvider);
-        Files.writeString(Path.of(path + "/vpc.tf"), vpc);
-        Files.writeString(Path.of(path + "/firewall.tf"), firewall);
-        Files.writeString(Path.of(path + "/service-account.tf"), serviceAccount);
-        Files.writeString(Path.of(path + "/awx-vm.tf"), currentAwxVM);
-        Files.writeString(Path.of(path + "/awx-firewall.tf"), awxFirewall);
+        // Prepare terraform main config.
+        String currentProvider = provider
+                .replace("{project}", inputConfiguration.project())
+                .replace("{region}", inputConfiguration.region())
+                .replace("{zone}", inputConfiguration.zone());
+        String currentAwxVM = awxVM
+                .replace("{awx-machine-type}", inputConfiguration.awxMachineType())
+                .replace("{ssh-key}", sshKeyConfiguration.sshKey());
 
-        String ansiblePath = args.getOptionValues("ansiblePath").get(0);
+        // Write terraform main config.
+        Files.writeString(Path.of(path + "/terraform/provider.tf"), currentProvider);
+        Files.writeString(Path.of(path + "/terraform/vpc.tf"), vpc);
+        Files.writeString(Path.of(path + "/terraform/firewall.tf"), firewall);
+        Files.writeString(Path.of(path + "/terraform/service-account.tf"), serviceAccount);
+        Files.writeString(Path.of(path + "/terraform/awx-vm.tf"), currentAwxVM);
+        Files.writeString(Path.of(path + "/terraform/awx-firewall.tf"), awxFirewall);
 
-        Path inventoryPath = Path.of(ansiblePath + "/public-inventory-gcp.yml");
+        // Prepare ansible main config.
+        String currentVars = vars
+                .replace("{awx-operator-version}", inputConfiguration.awxOperatorVersion());
+        String currentPublicInventoryGcp = publicInventoryGcp
+                .replace("{project}", inputConfiguration.project())
+                .replace("{zone}", inputConfiguration.zone());
 
-        String publicGCPInventory = Files.readString(inventoryPath)
-                .replace("{project}", configurationInput.project())
-                .replace("{zone}", configurationInput.zone());
+        // Write ansible main config.
+        Files.writeString(Path.of(path + "/ansible/ansible.cfg"), ansibleCfg);
+        Files.writeString(Path.of(path + "/ansible/vars.yml"), currentVars);
+        Files.writeString(Path.of(path + "/ansible/awx-setup-playbook.yml"), awxSetupPlaybook);
+        Files.writeString(Path.of(path + "/ansible/public-inventory-gcp.yml"), currentPublicInventoryGcp);
 
-        Files.writeString(inventoryPath, publicGCPInventory);
+        // Prepare k3s main config.
+        String currentKustomization = kustomization
+                .replace("{awx-operator-version}", inputConfiguration.awxOperatorVersion());
 
-        Path varsPath = Path.of(ansiblePath + "/vars.yml");
-
-        String vars = Files.readString(varsPath)
-                .replace("{awx-operator-version}", configurationInput.awxOperatorVersion());
-
-        Files.writeString(varsPath, vars);
-
-        Path kustomizationPath = Path.of(ansiblePath + "/kustomization.yml");
-
-        String kustomization = Files.readString(varsPath)
-                .replace("{awx-operator-version}", configurationInput.awxOperatorVersion());
-
-        Files.writeString(kustomizationPath, kustomization);
+        // Write k3s main config.
+        Files.writeString(Path.of(path + "/k3s/kustomization.yml"), currentKustomization);
+        Files.writeString(Path.of(path + "/k3s/awx.yml"), awxK3s);
     }
 }

@@ -2,7 +2,7 @@ package com.wavestone.ansibleTrainingSetup;
 
 import java.util.List;
 
-public record ConfigurationInput(
+public record InputConfiguration(
         String project,
         String region,
         String zone,

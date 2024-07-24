@@ -4,14 +4,14 @@
   "zone": "europe-west9-c",
   "awxMachineType": "n2-standard-2",
   "userMachineType": "e2-standard-2",
-  "awxOperatorVersion": "24.6.1",
+  "awxOperatorVersion": "2.19.1",
   "users": [
     {
-      "username": "jacques.dupont",
+      "username": "trainer.example",
       "role": "TRAINER"
     },
     {
-      "username": "jean.dupont",
+      "username": "trainee.example",
       "role": "TRAINEE"
     }
   ]
