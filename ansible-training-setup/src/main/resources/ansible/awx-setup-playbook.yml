@@ -18,7 +18,7 @@
         state: latest
 
     - name: Install k3s.
-      command: curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+      shell: curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
       args:
         creates: /k3s
 
@@ -39,10 +39,15 @@
         single_branch: yes
         version: "{{ awxOperatorVersion }}"
 
+    - name: Creates directory for AWX Kube config.
+      file:
+        path: /awx
+        state: directory
+
     - name: Copy AWX Kube config 1/2.
       copy:
         src: "{{ path }}/k3s/kustomization.yml"
-        dest: /awx-operator/kustomization.yml
+        dest: /awx/kustomization.yml
         owner: ansible
         group: ansible
         mode: "770"
@@ -50,7 +55,7 @@
     - name: Copy AWX Kube config 2/2.
       copy:
         src: "{{ path }}/k3s/awx.yml"
-        dest: /awx-operator/awx.yml
+        dest: /awx/awx.yml
         owner: ansible
         group: ansible
         mode: "770"
@@ -65,4 +70,4 @@
     - name: Start AWX.
       command: kubectl apply -n awx -k .
       args:
-        chdir: /awx-operator
+        chdir: /awx
