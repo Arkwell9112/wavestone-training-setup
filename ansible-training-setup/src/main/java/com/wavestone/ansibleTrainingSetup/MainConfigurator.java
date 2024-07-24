@@ -38,9 +38,9 @@ public class MainConfigurator implements ApplicationRunner {
 
     private final String awxSetupPlaybook;
 
-    private final String publicInventoryGcp;
+    private final String awxCheckPlaybook;
 
-    private final String kustomization;
+    private final String publicInventoryGcp;
 
     private final String awxK3s;
 
@@ -57,8 +57,8 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:ansible/ansible.cfg") Resource ansibleCfg,
             @Value("classpath:ansible/vars.yml") Resource vars,
             @Value("classpath:ansible/awx-setup-playbook.yml") Resource awxSetupPlaybook,
+            @Value("classpath:ansible/awx-check-playbook.yml") Resource awxCheckPlaybook,
             @Value("classpath:ansible/public-inventory-gcp.yml") Resource publicInventoryGcp,
-            @Value("classpath:k3s/kustomization.yml") Resource kustomization,
             @Value("classpath:k3s/awx.yml") Resource awxK3s
     ) throws IOException {
         this.inputConfiguration = inputConfiguration;
@@ -72,8 +72,8 @@ public class MainConfigurator implements ApplicationRunner {
         this.ansibleCfg = resourceToString.resourceToString(ansibleCfg);
         this.vars = resourceToString.resourceToString(vars);
         this.awxSetupPlaybook = resourceToString.resourceToString(awxSetupPlaybook);
+        this.awxCheckPlaybook = resourceToString.resourceToString(awxCheckPlaybook);
         this.publicInventoryGcp = resourceToString.resourceToString(publicInventoryGcp);
-        this.kustomization = resourceToString.resourceToString(kustomization);
         this.awxK3s = resourceToString.resourceToString(awxK3s);
     }
 
@@ -109,14 +109,10 @@ public class MainConfigurator implements ApplicationRunner {
         Files.writeString(Path.of(path + "/ansible/ansible.cfg"), ansibleCfg);
         Files.writeString(Path.of(path + "/ansible/vars.yml"), currentVars);
         Files.writeString(Path.of(path + "/ansible/awx-setup-playbook.yml"), awxSetupPlaybook);
+        Files.writeString(Path.of(path + "/ansible/awx-check-playbook.yml"), awxCheckPlaybook);
         Files.writeString(Path.of(path + "/ansible/public-inventory-gcp.yml"), currentPublicInventoryGcp);
 
-        // Prepare k3s main config.
-        String currentKustomization = kustomization
-                .replace("{awx-operator-version}", inputConfiguration.awxOperatorVersion());
-
         // Write k3s main config.
-        Files.writeString(Path.of(path + "/k3s/kustomization.yml"), currentKustomization);
         Files.writeString(Path.of(path + "/k3s/awx.yml"), awxK3s);
     }
 }

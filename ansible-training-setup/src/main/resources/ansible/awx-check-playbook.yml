@@ -1,0 +1,14 @@
+---
+
+- name: Check Playbook if AWX installation is running.
+  hosts: gcp_category_awx
+  become: yes
+
+  tasks:
+    - name: Check AWX running.
+      shell: kubectl get svc -n awx -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}'
+      register: awxCheck
+
+    - name: Debug AWX running.
+      debug:
+        var: awxCheck
