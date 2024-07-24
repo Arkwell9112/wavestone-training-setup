@@ -56,7 +56,7 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:terraform/awx-firewall.tf") Resource awxFirewall,
             @Value("classpath:ansible/ansible.cfg") Resource ansibleCfg,
             @Value("classpath:ansible/vars.yml") Resource vars,
-            @Value("classpath:ansible/awx-setupPlaybook.yml") Resource awxSetupPlaybook,
+            @Value("classpath:ansible/awx-setup-playbook.yml") Resource awxSetupPlaybook,
             @Value("classpath:ansible/public-inventory-gcp.yml") Resource publicInventoryGcp,
             @Value("classpath:k3s/kustomization.yml") Resource kustomization,
             @Value("classpath:k3s/awx.yml") Resource awxK3s
