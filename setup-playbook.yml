@@ -27,7 +27,7 @@
         state: latest
 
     - name: Build configurator app.
-      command: sudo mvn package --quiet
+      shell: sudo mvn package --quiet
       args:
         chdir: "{{ path }}/ansible-training-setup"
         creates: "{{ path }}/ansible-training-setup/target/ansible-training-setup.jar"
@@ -48,7 +48,7 @@
         state: directory
 
     - name: Creates SSH key.
-      command: ssh-keygen -q -t rsa -b 4096 -N '' -f ssh-key
+      shell: ssh-keygen -q -t rsa -b 4096 -N '' -f ssh-key
       args:
         chdir: "{{ path }}/ansible"
         creates: "{{ path }}/ansible/ssh-key"

@@ -7,67 +7,60 @@
   tasks:
     - include_vars: vars.yml
 
-    - name: Install Make.
-      apt:
-        name: make
-        state: latest
-
     - name: Install Git.
       apt:
         name: git
         state: latest
 
+    - name: Install Make.
+      apt:
+        name: make
+        state: latest
+
     - name: Install k3s.
-      shell: curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+      shell: curl -sfL https://get.k3s.io | sh -
       args:
         creates: /k3s
 
     - name: Validate - Install k3s.
-      command: touch /k3s
+      shell: touch /k3s
       args:
         creates: /k3s
 
     - name: Create directory for AWX Operator repo.
       file:
-        path: /awx-operator
+        path: /awx
         state: directory
 
     - name: Clone AWX Operator repo.
       git:
         repo: https://github.com/ansible/awx-operator.git
-        dest: /awx-operator
+        dest: /awx
         single_branch: yes
         version: "{{ awxOperatorVersion }}"
-
-    - name: Creates directory for AWX Kube config.
-      file:
-        path: /awx
-        state: directory
-
-    - name: Copy AWX Kube config 1/2.
-      copy:
-        src: "{{ path }}/k3s/kustomization.yml"
-        dest: /awx/kustomization.yml
-        owner: ansible
-        group: ansible
-        mode: "770"
-
-    - name: Copy AWX Kube config 2/2.
-      copy:
-        src: "{{ path }}/k3s/awx.yml"
-        dest: /awx/awx.yml
-        owner: ansible
-        group: ansible
-        mode: "770"
 
     - name: Start AWX Operator.
       make:
         target: deploy
-        chdir: /awx-operator
-      environment:
-        NAMESPACE: awx
+        chdir: /awx
+
+    - name: Create directory for AWX k3s config.
+      file:
+        path: /awx-config
+        state: directory
+
+    - name: Copy AWX k3s config.
+      copy:
+        src: /k3s/awx.yml
+        dest: /awx-config/awx.yml
 
     - name: Start AWX.
-      command: kubectl apply -n awx -k .
+      shell: kubectl apply -n awx -f awx.yml
       args:
-        chdir: /awx
+        chdir: /awx-config
+        creates: /awx-started
+
+    - name: Validate - Start AWX.
+      shell: touch /awx-started
+      args:
+        creates: /awx-started
