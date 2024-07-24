@@ -5,6 +5,8 @@
   become: yes
 
   tasks:
+    - include_vars: vars.yml
+
     - name: Install Docker gpg.
       apt_key:
         url: https://download.docker.com/linux/debian/gpg
@@ -27,7 +29,12 @@
 
     - name: Update apt and Install Docker.
       apt:
-        name: docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
         state: latest
         update_cache: true
 
@@ -56,11 +63,26 @@
         repo: https://github.com/ansible/awx.git
         dest: /awx
         single_branch: yes
-        version: 24.6.1
+        version: "{{ awx-version }}"
 
-    - name: Start AWX.
+    - name: Build AWX Containers.
+      make:
+        chdir: /awx
+        target: docker-compose-build
+
+    - name: Start AWX Containers.
       make:
         chdir: /awx
         target: docker-compose
         params:
           COMPOSE_UP_OPTS: -d
+
+    - name: Build and Start AWX UI/API.
+      command: docker exec tools_awx_1 make clean-ui ui-devel
+      args:
+        creates: /ui-api-build-start
+
+    - name: Validate - Build and Start AWX UI/API.
+      command: touch /ui-api-build-start
+      args:
+        creates: /ui-api-build-start

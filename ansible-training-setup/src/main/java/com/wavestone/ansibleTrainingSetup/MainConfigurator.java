@@ -53,7 +53,6 @@ public class MainConfigurator implements ApplicationRunner {
         this.awxFirewall = resourceToString.resourceToString(awxFirewall);
     }
 
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
         String currentProvider = provider
@@ -72,5 +71,22 @@ public class MainConfigurator implements ApplicationRunner {
         Files.writeString(Path.of(path + "/service-account.tf"), serviceAccount);
         Files.writeString(Path.of(path + "/awx-vm.tf"), currentAwxVM);
         Files.writeString(Path.of(path + "/awx-firewall.tf"), awxFirewall);
+
+        String ansiblePath = args.getOptionValues("ansiblePath").get(0);
+
+        Path inventoryPath = Path.of(ansiblePath + "/public-inventory-gcp.yml");
+
+        String publicGCPInventory = Files.readString(inventoryPath)
+                .replace("{project}", configurationInput.project())
+                .replace("{zone}", configurationInput.zone());
+
+        Files.writeString(inventoryPath, publicGCPInventory);
+
+        Path varsPath = Path.of(ansiblePath + "/vars.yml");
+
+        String vars = Files.readString(varsPath)
+                .replace("{awx-version}", configurationInput.awxVersion());
+
+        Files.writeString(varsPath, vars);
     }
 }

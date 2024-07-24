@@ -4,6 +4,7 @@
   "zone": "europe-west9-c",
   "awxMachineType": "n2-standard-2",
   "userMachineType": "e2-standard-2",
+  "awxVersion": "24.6.1",
   "users": [
     {
       "username": "jacques.dupont",

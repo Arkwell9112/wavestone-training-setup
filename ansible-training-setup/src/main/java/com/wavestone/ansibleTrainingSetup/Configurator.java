@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +24,9 @@ public class Configurator {
     }
 
     @Bean
+    @Profile("setup")
     public SSHKeyConfiguration sshKeyConfiguration(ApplicationArguments applicationArguments) throws IOException {
-        String rawKey = Files.readString(Path.of(applicationArguments.getOptionValues("sshPath").get(0)));
+        String rawKey = Files.readString(Path.of(applicationArguments.getOptionValues("ansiblePath").get(0) + "/ssh-key.pub"));
 
         String[] keyParts = rawKey.split(" ");
         String key = keyParts[0] + " " + keyParts[1];

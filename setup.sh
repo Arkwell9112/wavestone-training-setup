@@ -12,6 +12,11 @@ then
   touch /ansible
 fi
 
+if [[ ! -f "ansible/ssh-key" ]]
+then
+  ssh-keygen -q -t rsa -b 4096 -N '' -f ansible/ssh-key
+fi
+
 cd ansible || exit
 
 ansible-playbook setup-playbook.yml --extra-vars "path=${path} inputPath=${1}"

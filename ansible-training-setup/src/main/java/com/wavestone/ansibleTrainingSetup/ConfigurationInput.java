@@ -8,6 +8,7 @@ public record ConfigurationInput(
         String zone,
         String awxMachineType,
         String userMachineType,
+        String awxVersion,
         List<User> users
 ) {
     public record User(

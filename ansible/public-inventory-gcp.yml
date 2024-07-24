@@ -2,9 +2,9 @@
 
 plugin: google.cloud.gcp_compute
 projects:
-  - "{{ project }}"
+  - "{project}"
 zones:
-  - "{{ zone }}"
+  - "{zone}"
 filters:
   - status = RUNNING
   - scheduling.automaticRestart = true AND status = RUNNING
