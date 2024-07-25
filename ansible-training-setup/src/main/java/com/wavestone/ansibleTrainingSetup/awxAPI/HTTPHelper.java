@@ -52,11 +52,14 @@ public class HTTPHelper {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
             connection.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8)));
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
 
             if (body != null) {
                 connection.setDoOutput(true);
                 outputStream = connection.getOutputStream();
                 objectMapper.writeValue(outputStream, body);
+                outputStream.flush();
             }
 
             int code = connection.getResponseCode();
@@ -68,6 +71,7 @@ public class HTTPHelper {
 
             inputStream = connection.getInputStream();
 
+            if (response == null) return null;
             return objectMapper.readValue(inputStream, response);
         } finally {
             if (inputStream != null) {

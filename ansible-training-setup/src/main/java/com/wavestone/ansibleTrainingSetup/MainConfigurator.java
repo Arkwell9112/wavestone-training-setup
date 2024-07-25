@@ -42,7 +42,11 @@ public class MainConfigurator implements ApplicationRunner {
 
     private final String publicInventoryGcp;
 
-    private final String awxK3s;
+    private final String awxKusto;
+
+    private final String awxPatch;
+
+    private final String awxDeploy;
 
     public MainConfigurator(
             ResourceToString resourceToString,
@@ -59,7 +63,9 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:ansible/awx-setup-playbook.yml") Resource awxSetupPlaybook,
             @Value("classpath:ansible/awx-check-playbook.yml") Resource awxCheckPlaybook,
             @Value("classpath:ansible/public-inventory-gcp.yml") Resource publicInventoryGcp,
-            @Value("classpath:k3s/awx.yml") Resource awxK3s
+            @Value("classpath:k3s/kustomization.yml.yml") Resource awxKusto,
+            @Value("classpath:k3s/awx-patch.yml") Resource awxDeploy,
+            @Value("classpath:k3s/awx-deploy.yml") Resource awxPatch
     ) throws IOException {
         this.inputConfiguration = inputConfiguration;
         this.sshKeyConfiguration = sshKeyConfiguration;
@@ -74,7 +80,9 @@ public class MainConfigurator implements ApplicationRunner {
         this.awxSetupPlaybook = resourceToString.resourceToString(awxSetupPlaybook);
         this.awxCheckPlaybook = resourceToString.resourceToString(awxCheckPlaybook);
         this.publicInventoryGcp = resourceToString.resourceToString(publicInventoryGcp);
-        this.awxK3s = resourceToString.resourceToString(awxK3s);
+        this.awxKusto = resourceToString.resourceToString(awxKusto);
+        this.awxPatch = resourceToString.resourceToString(awxPatch);
+        this.awxDeploy = resourceToString.resourceToString(awxDeploy);
     }
 
     @Override
@@ -112,7 +120,15 @@ public class MainConfigurator implements ApplicationRunner {
         Files.writeString(Path.of(path + "/ansible/awx-check-playbook.yml"), awxCheckPlaybook);
         Files.writeString(Path.of(path + "/ansible/public-inventory-gcp.yml"), currentPublicInventoryGcp);
 
+        // Prepare k3s main config.
+        String currentAWXKusto = awxKusto
+                .replace("{awx-operator-version}", inputConfiguration.awxOperatorVersion());
+        String currentAWXPatch = awxPatch
+                .replace("{awx-operator-version}", inputConfiguration.awxOperatorVersion());
+
         // Write k3s main config.
-        Files.writeString(Path.of(path + "/k3s/awx.yml"), awxK3s);
+        Files.writeString(Path.of(path + "/k3s/kustomization.yml"), currentAWXKusto);
+        Files.writeString(Path.of(path + "/k3s/awx-patch.yml"), currentAWXPatch);
+        Files.writeString(Path.of(path + "/k3s/awx-deploy.yml"), awxDeploy);
     }
 }

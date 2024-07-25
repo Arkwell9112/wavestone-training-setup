@@ -6,26 +6,9 @@
 
   tasks:
     - name: Check AWX running.
-      shell: >
-        {% raw %} kubectl get svc -n awx -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}' {% endraw %}
+      shell: kubectl get pods -A
       register: awxCheck
 
     - name: Debug AWX running.
       debug:
         msg: "{{ awxCheck.stdout }}"
-
-    - name: Check AWX IP.
-      shell: terraform output -raw awx-vm-ip
-      args:
-        chdir: "{{ path }}/terraform"
-      register: awxIP
-      delegate_to: localhost
-
-    - name: Debug AWX IP.
-      debug:
-        msg: "{{ awxIP.stdout }}"
-
-    - name: Debug AWX link.
-      debug:
-        msg: "http://{{ awxIP.stdout }}:{{ awxCheck.stdout }}"
-      when: awxCheck.stdout != ""

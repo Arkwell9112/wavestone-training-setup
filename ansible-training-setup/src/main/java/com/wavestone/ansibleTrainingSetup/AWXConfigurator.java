@@ -1,8 +1,7 @@
 package com.wavestone.ansibleTrainingSetup;
 
-import com.wavestone.ansibleTrainingSetup.awxAPI.HTTPHelper;
-import com.wavestone.ansibleTrainingSetup.awxAPI.ObjectResponse;
-import com.wavestone.ansibleTrainingSetup.awxAPI.OrganizationCreationRequest;
+import com.wavestone.ansibleTrainingSetup.awxAPI.AWXHelper;
+import com.wavestone.ansibleTrainingSetup.awxAPI.ElementList;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
@@ -13,25 +12,15 @@ import org.springframework.stereotype.Component;
 @Profile("configure")
 @Order(0)
 public class AWXConfigurator implements ApplicationRunner {
-    private final HTTPHelper httpHelper;
+    private final AWXHelper awxHelper;
 
-    public AWXConfigurator(HTTPHelper httpHelper) {
-        this.httpHelper = httpHelper;
+    public AWXConfigurator(AWXHelper awxHelper) {
+        this.awxHelper = awxHelper;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        OrganizationCreationRequest organizationCreationRequest = new OrganizationCreationRequest(
-                "Training",
-                "Organization for training at Wavestone."
-        );
-        ObjectResponse organization = httpHelper.request(
-                "POST",
-                "/organizations",
-                organizationCreationRequest,
-                ObjectResponse.class
-        );
-
-        System.out.println(organization.id());
+        ElementList.ElementResponse organization = awxHelper.createOrganization();
+        ElementList.ElementResponse credential = awxHelper.createCredential(organization.id());
     }
 }
