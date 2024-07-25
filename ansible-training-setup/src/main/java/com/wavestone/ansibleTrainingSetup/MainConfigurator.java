@@ -64,8 +64,8 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:ansible/awx-check-playbook.yml") Resource awxCheckPlaybook,
             @Value("classpath:ansible/public-inventory-gcp.yml") Resource publicInventoryGcp,
             @Value("classpath:k3s/kustomization.yml") Resource awxKusto,
-            @Value("classpath:k3s/awx-patch.yml") Resource awxDeploy,
-            @Value("classpath:k3s/awx-deploy.yml") Resource awxPatch
+            @Value("classpath:k3s/awx-deploy.yml") Resource awxDeploy,
+            @Value("classpath:k3s/awx-patch.yml") Resource awxPatch
     ) throws IOException {
         this.inputConfiguration = inputConfiguration;
         this.sshKeyConfiguration = sshKeyConfiguration;
