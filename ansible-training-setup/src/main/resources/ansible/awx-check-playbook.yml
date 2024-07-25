@@ -11,5 +11,11 @@
       register: awxCheck
 
     - name: Debug AWX running.
-      debug:
-        var: awxCheck
+      debug: "{{ awxCheck.stdout }}"
+
+    - name: Check AWX IP.
+      shell: terraform output awx-vm-ip
+      register: awxIP
+
+    - name: Debug AWX IP.
+      debug: "{{ awxIP.stdout }}"
