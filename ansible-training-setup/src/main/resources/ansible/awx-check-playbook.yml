@@ -24,3 +24,8 @@
     - name: Debug AWX IP.
       debug:
         msg: "{{ awxIP.stdout }}"
+
+    - name: Debug AWX link.
+      debug:
+        msg: "http://{{ awxIP.stdout }}:{{ awxCheck.stdout }}"
+      when: awxCheck.stdout != ""
