@@ -32,32 +32,33 @@
         path: /awx
         state: directory
 
+    - name: Check if repo already cloned.
+      stat:
+        path: /awx/awx-demo.yml
+      register: awxRepoPresent
+
     - name: Clone AWX Operator repo.
       git:
         repo: https://github.com/ansible/awx-operator.git
         dest: /awx
         single_branch: yes
         version: "{{ awxOperatorVersion }}"
+      when: not awxRepoPresent.stat.exists
 
     - name: Start AWX Operator.
       make:
         target: deploy
         chdir: /awx
 
-    - name: Create directory for AWX k3s config.
-      file:
-        path: /awx-config
-        state: directory
-
     - name: Copy AWX k3s config.
       copy:
-        src: /k3s/awx.yml
-        dest: /awx-config/awx.yml
+        src: "{{ path }}/k3s/awx.yml"
+        dest: /awx/awx-deploy.yml
 
     - name: Start AWX.
-      shell: kubectl apply -n awx -f awx.yml
+      shell: kubectl apply -n awx -f awx-deploy.yml
       args:
-        chdir: /awx-config
+        chdir: /awx
         creates: /awx-started
 
     - name: Validate - Start AWX.
