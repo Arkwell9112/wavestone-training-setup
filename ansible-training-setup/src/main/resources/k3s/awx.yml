@@ -5,6 +5,7 @@ metadata:
   name: awx-deploy
 spec:
   service_type: nodeport
+  nodeport_port: 30180
   web_resource_requirements:
     requests:
       cpu: "0"
