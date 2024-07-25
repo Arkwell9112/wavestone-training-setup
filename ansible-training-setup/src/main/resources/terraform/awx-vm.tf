@@ -21,13 +21,7 @@ resource "google_compute_instance" "awx_vm" {
   }
 
   boot_disk {
-    initialize_params {
-      image = "debian-cloud/debian-11"
-    }
-  }
-
-  scratch_disk {
-    interface = "NVME"
+    source = google_compute_disk.awx_vm_disk.name
   }
 
   network_interface {
@@ -43,6 +37,12 @@ resource "google_compute_instance" "awx_vm" {
   }
 }
 
-output "awx-vm-ip" {
+resource "google_compute_disk" "awx_vm_disk" {
+  name  = "awx-vm-disk"
+  image = "debian-cloud/debian-11"
+  size  = 100
+}
+
+output "awx_vm_ip" {
   value = google_compute_address.awx_ip.address
 }
