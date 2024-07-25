@@ -15,7 +15,7 @@
         msg: "{{ awxCheck.stdout }}"
 
     - name: Check AWX IP.
-      shell: terraform output awx-vm-ip
+      shell: terraform output -raw awx-vm-ip
       args:
         chdir: "{{ path }}/terraform"
       register: awxIP
