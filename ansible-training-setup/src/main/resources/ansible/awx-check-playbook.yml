@@ -17,6 +17,7 @@
     - name: Check AWX IP.
       shell: terraform output awx-vm-ip
       register: awxIP
+      delegate_to: localhost
 
     - name: Debug AWX IP.
       debug:
