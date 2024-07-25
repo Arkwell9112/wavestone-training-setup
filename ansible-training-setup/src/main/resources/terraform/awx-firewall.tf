@@ -10,6 +10,6 @@ resource "google_compute_firewall" "awx_ingress_external" {
 
   allow {
     protocol = "tcp"
-    ports    = [22]
+    ports    = [22, 30180]
   }
 }
