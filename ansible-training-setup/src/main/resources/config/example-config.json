@@ -9,10 +9,6 @@
     {
       "username": "trainer.example",
       "role": "TRAINER"
-    },
-    {
-      "username": "trainee.example",
-      "role": "TRAINEE"
     }
   ]
 }

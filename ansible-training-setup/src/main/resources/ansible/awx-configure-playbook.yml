@@ -1,0 +1,29 @@
+---
+
+- name: Configuration Playbook for AWX Training.
+  hosts: gcp_category_awx
+  become: yes
+
+  tasks:
+    - name: Get AWX IP.
+      shell: terraform output -raw awx_vm_ip
+      args:
+        chdir: "{{ path }}/terraform"
+      register: awxIP
+      delegate_to: localhost
+
+    - name: Get AWX Port.
+      shell: >
+        {% raw %} kubectl get svc -n awx -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}' {% endraw %}
+      args:
+        chdir: "{{ path }}/terraform"
+      register: awxPort
+
+    - name: Get AWX admin password.
+      shell: kubectl get secret awx-deploy-admin-password -o jsonpath="{.data.password}" -n awx | base64 --decode
+      register: awxPassword
+
+    - name: Execute configurator configure (AWX) target.
+      shell: java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.profiles.active=configure --path={{ path }} --input={{ inputPath }} --awxIP={{ awxIP.stdout }} --awxPort={{ awxPort.stdout }} --awxUsername=admin --awxPassword={{ awxPassword.stdout }}
+      args:
+        chdir: "{{ path }}"

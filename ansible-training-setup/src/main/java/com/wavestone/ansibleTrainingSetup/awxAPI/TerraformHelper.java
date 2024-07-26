@@ -15,19 +15,19 @@ public class TerraformHelper {
     }
 
     public String getUserVMPrivateIPFirst(int index) throws InterruptedException, IOException {
-        return processWithResult(String.format("terraform output -raw user_%s_vm_private_ip_first", index));
+        return processWithResult(String.format("terraform -chdir=terraform output -raw user_%s_vm_private_ip_first", index));
     }
 
     public String getUserVMPublicIPFirst(int index) throws InterruptedException, IOException {
-        return processWithResult(String.format("terraform output -raw user_%s_vm_public_ip_first", index));
+        return processWithResult(String.format("terraform -chdir=terraform output -raw user_%s_vm_public_ip_first", index));
     }
 
     public String getUserVMPrivateIPSecond(int index) throws InterruptedException, IOException {
-        return processWithResult(String.format("terraform output -raw user_%s_vm_private_ip_second", index));
+        return processWithResult(String.format("terraform -chdir=terraform output -raw user_%s_vm_private_ip_second", index));
     }
 
     public String getUserVMPublicIPSecond(int index) throws InterruptedException, IOException {
-        return processWithResult(String.format("terraform output -raw user_%s_vm_public_ip_second", index));
+        return processWithResult(String.format("terraform -chdir=terraform output -raw user_%s_vm_public_ip_second", index));
     }
 
     private String processWithResult(String command) throws IOException, InterruptedException {
