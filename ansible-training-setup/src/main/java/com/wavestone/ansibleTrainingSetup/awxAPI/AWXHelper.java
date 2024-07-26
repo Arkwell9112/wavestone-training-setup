@@ -1,27 +1,20 @@
 package com.wavestone.ansibleTrainingSetup.awxAPI;
 
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Component
 public class AWXHelper {
     private final HTTPHelper httpHelper;
 
-    private final String path;
-
-    public AWXHelper(HTTPHelper httpHelper, ApplicationArguments applicationArguments) {
+    public AWXHelper(HTTPHelper httpHelper) {
         this.httpHelper = httpHelper;
-        this.path = applicationArguments.getOptionValues("path").get(0);
     }
 
-    public ElementList.ElementResponse createOrganization() throws Exception {
+    public ElementList.ElementResponse createOrganization(String name, String description) throws Exception {
         try {
             OrganizationCreationRequest organizationCreationRequest = new OrganizationCreationRequest(
-                    "Training",
-                    "Organization for training at Wavestone."
+                    name,
+                    description
             );
 
             return httpHelper.request(
@@ -39,25 +32,68 @@ public class AWXHelper {
             );
 
             for (ElementList.ElementResponse organization : organizations.results()) {
-                if (organization.name().equals("Training")) return organization;
+                if (organization.name().equals(name)) return organization;
             }
 
             throw new Exception("Cannot make validation request.");
         }
     }
 
-    public ElementList.ElementResponse createCredential(String organization) throws Exception {
-        String sshKey = Files.readString(Path.of(path + "/ansible/ssh-key"));
+    public ElementList.ElementResponse createUserInOrganization(String organization, String username, boolean isSuperUser, String password, boolean forcePassword) throws Exception {
+        try {
+            UserCreationRequest userCreationRequest = new UserCreationRequest(
+                    username,
+                    isSuperUser,
+                    password
+            );
 
+            return httpHelper.request(
+                    "POST",
+                    "/organizations/" + organization + "/users/",
+                    userCreationRequest,
+                    ElementList.ElementResponse.class
+            );
+        } catch (Exception e) {
+            ElementList users = httpHelper.request(
+                    "GET",
+                    "/organizations/" + organization + "/users/",
+                    null,
+                    ElementList.class
+            );
+
+            if (!forcePassword) {
+                for (ElementList.ElementResponse user : users.results()) {
+                    if (!user.username().equals(username)) return user;
+                }
+            } else {
+                for (ElementList.ElementResponse user : users.results()) {
+                    if (!user.username().equals(username)) continue;
+                    httpHelper.request(
+                            "PATCH",
+                            "/users/" + user.id(),
+                            new UserUpdateRequest(
+                                    password
+                            ),
+                            null
+                    );
+                    return user;
+                }
+            }
+
+            throw new Exception("Cannot make validation request.");
+        }
+    }
+
+    public ElementList.ElementResponse createSSHMachineCredential(String name, String description, String organization, String privateKey) throws Exception {
         try {
             CredentialCreationRequest credentialCreationRequest = new CredentialCreationRequest(
-                    "MAIN",
-                    "MAIN credential for training infrastructure.",
+                    name,
+                    description,
                     organization,
                     "1",
                     new CredentialCreationRequest.CredentialInput(
                             "ansible",
-                            sshKey,
+                            privateKey,
                             "sudo",
                             ""
                     )
@@ -78,7 +114,7 @@ public class AWXHelper {
             );
 
             for (ElementList.ElementResponse credential : credentials.results()) {
-                if (credential.name().equals("MAIN")) return credential;
+                if (!credential.name().equals(name)) return credential;
             }
 
             throw new Exception("Cannot make validation request.");

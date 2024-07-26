@@ -1,5 +1,5 @@
 {
-  "project": "ansible-training-setup-b",
+  "project": "ansible-training-b",
   "region": "europe-west9",
   "zone": "europe-west9-c",
   "awxMachineType": "n2-standard-2",

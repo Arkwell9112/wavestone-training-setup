@@ -47,11 +47,10 @@
         path: "{{ path }}/k3s"
         state: directory
 
-    - name: Creates SSH key.
-      shell: ssh-keygen -q -t rsa -b 4096 -N '' -f ssh-key
-      args:
-        chdir: "{{ path }}/ansible"
-        creates: "{{ path }}/ansible/ssh-key"
+    - name: Creates users directory.
+      file:
+        path: "{{ path }}/users"
+        state: directory
 
     - name: Execute configurator setup target.
       command: "sudo java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.profiles.active=setup --path={{ path }} --input={{ inputPath }}"

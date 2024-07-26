@@ -8,6 +8,7 @@ public record ElementList(
     public record ElementResponse(
             String id,
             String name,
+            String username,
             SummaryFields summary_fields
     ) {
         public record SummaryFields(

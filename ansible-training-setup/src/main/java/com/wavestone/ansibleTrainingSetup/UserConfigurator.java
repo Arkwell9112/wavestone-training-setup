@@ -18,7 +18,7 @@ import java.nio.file.Path;
 public class UserConfigurator implements ApplicationRunner {
     private final InputConfiguration inputConfiguration;
 
-    private final SSHKeyConfiguration sshKeyConfiguration;
+    private final SSHHelper sshHelper;
 
     private final String userXVM;
 
@@ -27,12 +27,12 @@ public class UserConfigurator implements ApplicationRunner {
     public UserConfigurator(
             ResourceToString resourceToString,
             InputConfiguration inputConfiguration,
-            SSHKeyConfiguration sshKeyConfiguration,
+            SSHHelper sshHelper,
             @Value("classpath:terraform/user-x-vm.tf") Resource userXVM,
             @Value("classpath:terraform/user-x-firewall.tf") Resource userXFirewall
     ) throws IOException {
         this.inputConfiguration = inputConfiguration;
-        this.sshKeyConfiguration = sshKeyConfiguration;
+        this.sshHelper = sshHelper;
         this.userXVM = resourceToString.resourceToString(userXVM);
         this.userXFirewall = resourceToString.resourceToString(userXFirewall);
     }
@@ -42,10 +42,15 @@ public class UserConfigurator implements ApplicationRunner {
         String path = args.getOptionValues("path").get(0);
 
         for (int index = 2; index < inputConfiguration.users().size() + 2; index++) {
+            // Generate SSH key for user-vm.
+            sshHelper.generateSSHKey(path + String.format("/ansible/user-%s-ssh-key", index));
+            //Load the ssh key after generation.
+            String sshKey = sshHelper.loadSSHPublicKeyConfigurationForTerraform(path + String.format("/ansible/user-%s-ssh-key.pub", index));
+
             // Prepare terraform main config for user.
             String currentUserXVM = userXVM
                     .replace("{user-machine-type}", inputConfiguration.userMachineType())
-                    .replace("{ssh-key}", sshKeyConfiguration.sshKey());
+                    .replace("{ssh-key}", sshKey);
 
             // Prepare terraform user config for user.
             currentUserXVM = currentUserXVM
@@ -57,8 +62,8 @@ public class UserConfigurator implements ApplicationRunner {
                     .replace("user-x-vm-id", String.format("user_%s_vm", index))
                     .replace("{user-x-vm-name}", String.format("user-%s-vm", index))
                     .replace("{user-x-owner}", String.format("user-%s", index))
-                    .replace("user-x-vm-public-ip-output-id", String.format("user_%s_vm_public_ip_output", index))
-                    .replace("user-x-vm-private-ip-output-id", String.format("user_%s_vm_private_ip_output", index));
+                    .replace("user-x-vm-public-ip-output-id", String.format("user_%s_vm_public_ip", index))
+                    .replace("user-x-vm-private-ip-output-id", String.format("user_%s_vm_private_ip", index));
 
             String currentUserXFirewall = userXFirewall
                     .replace("user-x-ingress-internal-id", String.format("user_%s_ingress_internal", index))

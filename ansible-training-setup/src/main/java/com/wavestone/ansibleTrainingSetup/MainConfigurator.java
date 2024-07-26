@@ -18,7 +18,7 @@ import java.nio.file.Path;
 public class MainConfigurator implements ApplicationRunner {
     private final InputConfiguration inputConfiguration;
 
-    private final SSHKeyConfiguration sshKeyConfiguration;
+    private final SSHHelper sshHelper;
 
     private final String provider;
 
@@ -51,7 +51,7 @@ public class MainConfigurator implements ApplicationRunner {
     public MainConfigurator(
             ResourceToString resourceToString,
             InputConfiguration inputConfiguration,
-            SSHKeyConfiguration sshKeyConfiguration,
+            SSHHelper sshHelper,
             @Value("classpath:terraform/provider.tf") Resource provider,
             @Value("classpath:terraform/vpc.tf") Resource vpc,
             @Value("classpath:terraform/firewall.tf") Resource firewall,
@@ -68,7 +68,7 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:k3s/awx-patch.yml") Resource awxPatch
     ) throws IOException {
         this.inputConfiguration = inputConfiguration;
-        this.sshKeyConfiguration = sshKeyConfiguration;
+        this.sshHelper = sshHelper;
         this.provider = resourceToString.resourceToString(provider);
         this.vpc = resourceToString.resourceToString(vpc);
         this.firewall = resourceToString.resourceToString(firewall);
@@ -89,6 +89,11 @@ public class MainConfigurator implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         String path = args.getOptionValues("path").get(0);
 
+        // Generate SSH key for awx-vm.
+        sshHelper.generateSSHKey(path + "/ansible/awx-ssh-key");
+        //Load the ssh key after generation.
+        String sshKey = sshHelper.loadSSHPublicKeyConfigurationForTerraform(path + "/ansible/awx-ssh-key.pub");
+
         // Prepare terraform main config.
         String currentProvider = provider
                 .replace("{project}", inputConfiguration.project())
@@ -96,7 +101,7 @@ public class MainConfigurator implements ApplicationRunner {
                 .replace("{zone}", inputConfiguration.zone());
         String currentAwxVM = awxVM
                 .replace("{awx-machine-type}", inputConfiguration.awxMachineType())
-                .replace("{ssh-key}", sshKeyConfiguration.sshKey());
+                .replace("{ssh-key}", sshKey);
 
         // Write terraform main config.
         Files.writeString(Path.of(path + "/terraform/provider.tf"), currentProvider);

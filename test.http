@@ -1,4 +1,0 @@
-GET http://34.163.93.237:30180/api/v2/organizations/
-Authorization: Basic YWRtaW46TzFOQ0ZvZEZ1QnlPRk9VV1dwUXFzajNyaHduNm5mZW0=
-Content-Type: application/json
-Accept: application/json
