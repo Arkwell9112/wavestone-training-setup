@@ -27,3 +27,4 @@
       shell: java -jar ansible-training-setup/target/ansible-training-setup.jar --spring.profiles.active=configure --path={{ path }} --input={{ inputPath }} --awxIP={{ awxIP.stdout }} --awxPort={{ awxPort.stdout }} --awxUsername=admin --awxPassword={{ awxPassword.stdout }}
       args:
         chdir: "{{ path }}"
+      delegate_to: localhost

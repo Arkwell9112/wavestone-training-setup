@@ -40,6 +40,8 @@ public class MainConfigurator implements ApplicationRunner {
 
     private final String awxCheckPlaybook;
 
+    private final String awxConfigurePlaybook;
+
     private final String publicInventoryGcp;
 
     private final String awxKusto;
@@ -62,6 +64,7 @@ public class MainConfigurator implements ApplicationRunner {
             @Value("classpath:ansible/vars.yml") Resource vars,
             @Value("classpath:ansible/awx-setup-playbook.yml") Resource awxSetupPlaybook,
             @Value("classpath:ansible/awx-check-playbook.yml") Resource awxCheckPlaybook,
+            @Value("classpath:ansible/awx-configure-playbook.yml") Resource awxConfigurePlaybook,
             @Value("classpath:ansible/public-inventory-gcp.yml") Resource publicInventoryGcp,
             @Value("classpath:k3s/kustomization.yml") Resource awxKusto,
             @Value("classpath:k3s/awx-deploy.yml") Resource awxDeploy,
@@ -79,6 +82,7 @@ public class MainConfigurator implements ApplicationRunner {
         this.vars = resourceToString.resourceToString(vars);
         this.awxSetupPlaybook = resourceToString.resourceToString(awxSetupPlaybook);
         this.awxCheckPlaybook = resourceToString.resourceToString(awxCheckPlaybook);
+        this.awxConfigurePlaybook = resourceToString.resourceToString(awxConfigurePlaybook);
         this.publicInventoryGcp = resourceToString.resourceToString(publicInventoryGcp);
         this.awxKusto = resourceToString.resourceToString(awxKusto);
         this.awxPatch = resourceToString.resourceToString(awxPatch);
@@ -123,6 +127,7 @@ public class MainConfigurator implements ApplicationRunner {
         Files.writeString(Path.of(path + "/ansible/vars.yml"), currentVars);
         Files.writeString(Path.of(path + "/ansible/awx-setup-playbook.yml"), awxSetupPlaybook);
         Files.writeString(Path.of(path + "/ansible/awx-check-playbook.yml"), awxCheckPlaybook);
+        Files.writeString(Path.of(path + "/ansible/awx-configure-playbook.yml"), awxConfigurePlaybook);
         Files.writeString(Path.of(path + "/ansible/public-inventory-gcp.yml"), currentPublicInventoryGcp);
 
         // Prepare k3s main config.
