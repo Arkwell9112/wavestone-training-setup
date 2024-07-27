@@ -63,6 +63,7 @@ public class HTTPHelper {
             }
 
             int code = connection.getResponseCode();
+
             if (code < 200 || code >= 300) {
                 errorStream = connection.getErrorStream();
                 logger.error("Failed request:\n{}", resourceToString.streamToString(errorStream));

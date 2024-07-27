@@ -86,7 +86,7 @@ public class AWXHelper {
 
     public ElementList.ElementResponse associateRoleWithUser(String userId, String roleId) throws Exception {
         RoleAssociationRequest roleAssociationRequest = new RoleAssociationRequest(
-                roleId
+                Integer.parseInt(roleId)
         );
 
         return httpHelper.request(
