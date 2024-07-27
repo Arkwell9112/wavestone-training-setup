@@ -40,6 +40,8 @@ public class HTTPHelper {
         HttpRequest.BodyPublisher bodyPublisher = null;
         if (body != null) {
             bodyPublisher = HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body));
+        } else {
+            bodyPublisher = HttpRequest.BodyPublishers.noBody();
         }
 
         HttpClient client = HttpClient.newHttpClient();
