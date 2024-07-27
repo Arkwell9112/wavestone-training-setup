@@ -57,7 +57,7 @@ public class AWXConfigurator implements ApplicationRunner {
 
             boolean forceUpdate = !new File(path + "/users/" + userInput.username() + ".json").exists();
 
-            awxHelper.createUserInOrganization(
+            ElementList.ElementResponse user = awxHelper.createUserInOrganization(
                     organization.id(),
                     userInput.username(),
                     userInput.role() == InputConfiguration.User.Role.TRAINER,
@@ -66,6 +66,10 @@ public class AWXConfigurator implements ApplicationRunner {
             );
 
             // Give user administration rights on his organization.
+            awxHelper.associateRoleWithUser(
+                    user.id(),
+                    organization.summary_fields().object_roles().get("admin_role").id()
+            );
 
             // Create SSH credential for user VMs.
             awxHelper.createSSHMachineCredential(
@@ -76,8 +80,6 @@ public class AWXConfigurator implements ApplicationRunner {
             );
 
             // Create GCP Service Account credential for user dynamic inventory.
-
-            // Create Git credential for user repository.
 
             // Get user VMs information from terraform output.
             String firstVMPrivateIP = terraformHelper.getUserVMPrivateIPFirst(index);

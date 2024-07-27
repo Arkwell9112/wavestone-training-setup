@@ -84,6 +84,19 @@ public class AWXHelper {
         }
     }
 
+    public ElementList.ElementResponse associateRoleWithUser(String userId, String roleId) throws Exception {
+        RoleAssociationRequest roleAssociationRequest = new RoleAssociationRequest(
+                roleId
+        );
+
+        return httpHelper.request(
+                "POST",
+                "/users/" + userId + "/roles/",
+                roleAssociationRequest,
+                null
+        );
+    }
+
     public ElementList.ElementResponse createSSHMachineCredential(String name, String description, String organization, String privateKey) throws Exception {
         try {
             CredentialCreationRequest credentialCreationRequest = new CredentialCreationRequest(

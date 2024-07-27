@@ -1,0 +1,4 @@
+GET http://34.163.17.160:30180/api/v2/organizations/
+Authorization: Basic dHJhaW5lci5leGFtcGxlOjkrQTgrWmJrR2JIWldRNEJIQ1pQV2c9PQ==
+Content-Type: application/json
+Accept: application/json
