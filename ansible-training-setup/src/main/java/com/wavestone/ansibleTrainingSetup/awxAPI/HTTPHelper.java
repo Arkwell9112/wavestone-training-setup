@@ -50,14 +50,14 @@ public class HTTPHelper {
                 .method(method, bodyPublisher)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
-                .header("Authorization", Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8)))
                 .build();
 
         HttpResponse<String> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
             logger.error("Failed request :\n {}", httpResponse.body());
-            throw new Exception("Cannot di request.");
+            throw new Exception("Cannot do request.");
         }
 
         if (response != null) {
