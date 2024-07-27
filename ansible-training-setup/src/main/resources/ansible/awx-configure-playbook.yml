@@ -15,8 +15,6 @@
     - name: Get AWX Port.
       shell: >
         {% raw %} kubectl get svc -n awx -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}' {% endraw %}
-      args:
-        chdir: "{{ path }}/terraform"
       register: awxPort
 
     - name: Get AWX admin password.

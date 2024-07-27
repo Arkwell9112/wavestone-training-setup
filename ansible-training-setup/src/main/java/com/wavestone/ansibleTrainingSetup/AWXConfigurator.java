@@ -97,7 +97,7 @@ public class AWXConfigurator implements ApplicationRunner {
                     secondVMPublicIP
             );
 
-            if (!forceUpdate)
+            if (forceUpdate)
                 Files.writeString(Path.of(path + "/users/" + userInput.username() + ".json"), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userInfo));
         }
 

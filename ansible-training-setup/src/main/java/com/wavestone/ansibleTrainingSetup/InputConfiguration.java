@@ -16,7 +16,7 @@ public record InputConfiguration(
             Role role
     ) {
         public enum Role {
-            TRAINER, TRAINEE;
+            TRAINER, TRAINEE
         }
     }
 }

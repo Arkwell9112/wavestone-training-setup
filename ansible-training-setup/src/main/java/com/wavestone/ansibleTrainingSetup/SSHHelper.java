@@ -11,7 +11,18 @@ import java.nio.file.Path;
 public class SSHHelper {
     public void generateSSHKey(String path) throws IOException, InterruptedException {
         if (new File(path).exists()) return;
-        Runtime.getRuntime().exec("ssh-keygen -q -t rsa -b 4096 -N '' -f " + path).waitFor();
+        Runtime.getRuntime().exec(new String[]{
+                "ssh-keygen",
+                "-q",
+                "-t",
+                "rsa",
+                "-b",
+                "4096",
+                "-N",
+                "",
+                "-f",
+                path
+        }).waitFor();
     }
 
     public String loadSSHPublicKeyConfigurationForTerraform(String path) throws IOException {
