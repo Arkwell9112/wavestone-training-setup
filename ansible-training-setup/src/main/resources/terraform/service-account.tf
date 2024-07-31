@@ -19,5 +19,6 @@ resource "google_service_account_key" "read_rights_key" {
 }
 
 output "read_rights_private_key" {
-  value = google_service_account_key.read_rights_key.private_key
+  value     = google_service_account_key.read_rights_key.private_key
+  sensitive = true
 }
