@@ -3,7 +3,7 @@
   "region": "europe-west9",
   "zone": "europe-west9-c",
   "awxMachineType": "n2-standard-2",
-  "userMachineType": "e2-standard-2",
+  "userMachineType": "n2-standard-2",
   "awxOperatorVersion": "2.19.1",
   "users": [
     {
