@@ -39,7 +39,7 @@ resource "google_compute_instance" "user-x-vm-id_first" {
   }
 
   service_account {
-    email  = google_service_account.no_rights.email
+    email = google_service_account.no_rights.email
     scopes = ["cloud-platform"]
   }
 }
@@ -71,7 +71,7 @@ resource "google_compute_instance" "user-x-vm-id_second" {
   }
 
   service_account {
-    email  = google_service_account.no_rights.email
+    email = google_service_account.no_rights.email
     scopes = ["cloud-platform"]
   }
 }

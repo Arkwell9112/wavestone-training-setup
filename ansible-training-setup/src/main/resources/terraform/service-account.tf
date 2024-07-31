@@ -10,7 +10,7 @@ resource "google_service_account" "read_rights" {
 
 resource "google_project_iam_member" "read_rights_binding" {
   project = "{project}"
-  role    = "roles/datastore.owner"
+  role    = "roles/compute.viewer"
   member  = "serviceAccount:${google_service_account.read_rights.email}"
 }
 

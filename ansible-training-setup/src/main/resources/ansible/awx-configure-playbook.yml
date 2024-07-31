@@ -6,15 +6,17 @@
 
   tasks:
     - name: Read rights service account key retrieval.
-      shell: terraform output -raw read_rights_private_key
+      shell: terraform output -raw read_rights_private_key | base64 --decode
       args:
         chdir: "{{ path }}/terraform"
       register: rrPrivateKey
+      delegate_to: localhost
 
     - name: Read rights service account key creation.
       copy:
         content: "{{ rrPrivateKey.stdout }}"
         dest: "{{ path }}/users/rr-private-key.json"
+      delegate_to: localhost
 
     - name: Get AWX IP.
       shell: terraform output -raw awx_vm_ip
