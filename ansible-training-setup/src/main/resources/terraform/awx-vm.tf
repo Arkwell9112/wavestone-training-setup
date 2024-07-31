@@ -32,7 +32,7 @@ resource "google_compute_instance" "awx_vm" {
   }
 
   service_account {
-    email  = google_service_account.no_rights.email
+    email = google_service_account.read_rights.email
     scopes = ["cloud-platform"]
   }
 }

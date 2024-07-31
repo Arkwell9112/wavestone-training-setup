@@ -106,12 +106,14 @@ public class MainConfigurator implements ApplicationRunner {
         String currentAwxVM = awxVM
                 .replace("{awx-machine-type}", inputConfiguration.awxMachineType())
                 .replace("{ssh-key}", sshKey);
+        String currentServiceAccount = serviceAccount
+                .replace("{project}", inputConfiguration.project());
 
         // Write terraform main config.
         Files.writeString(Path.of(path + "/terraform/provider.tf"), currentProvider);
         Files.writeString(Path.of(path + "/terraform/vpc.tf"), vpc);
         Files.writeString(Path.of(path + "/terraform/firewall.tf"), firewall);
-        Files.writeString(Path.of(path + "/terraform/service-account.tf"), serviceAccount);
+        Files.writeString(Path.of(path + "/terraform/service-account.tf"), currentServiceAccount);
         Files.writeString(Path.of(path + "/terraform/awx-vm.tf"), currentAwxVM);
         Files.writeString(Path.of(path + "/terraform/awx-firewall.tf"), awxFirewall);
 
